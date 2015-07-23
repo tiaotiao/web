@@ -9,7 +9,7 @@ import (
 )
 
 type Logger interface {
-	OnLog(r *http.Request, start time.Time, used time.Duration, code int)
+	OnLog(r *http.Request, start time.Time, used time.Duration, code int, result interface{})
 }
 
 type WebFunc interface{}
@@ -66,12 +66,15 @@ func (h *WebHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		used := time.Since(start)
 
 		// response
-		code, _ := h.responser.Response(w, result)
+		code, err := h.responser.Response(w, result)
+		if err != nil {
+			result = err
+		}
 
 		h.stat.onServe(code, used)
 
 		if h.logger != nil {
-			h.logger.OnLog(r, start, used, code) // TODO log err
+			h.logger.OnLog(r, start, used, code, result)
 		}
 	}()
 

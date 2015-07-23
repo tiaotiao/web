@@ -35,7 +35,7 @@ func (th TestHandler) Get(c *Context) interface{} {
 
 type testLogger struct{}
 
-func (ta testLogger) OnLog(r *http.Request, start time.Time, used time.Duration, code int) {
+func (ta testLogger) OnLog(r *http.Request, start time.Time, used time.Duration, code int, result interface{}) {
 	testALStr += fmt.Sprintf("%s-%v-%v-%v", r.URL, start, used, code)
 }
 
