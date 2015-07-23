@@ -70,7 +70,7 @@ func NewErrorMsg(e, msg string, code int) *Error {
 }
 
 func (e *Error) Error() string {
-	return fmt.Sprintf("%v", e)
+	return fmt.Sprintf("%s %s", e.Err, e.Message)
 }
 
 func (e *Error) StatusCode() int {
