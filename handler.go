@@ -58,26 +58,38 @@ func NewWebHandler(fn WebFunc, midds *MiddlewaresManager, responser Responser, l
 }
 
 func (h *WebHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	var err error
+	var result interface{}
+	var start = time.Now()
+
+	defer func() {
+		used := time.Since(start)
+
+		// response
+		code, _ := h.responser.Response(w, result)
+
+		h.stat.onServe(code, used)
+
+		if h.logger != nil {
+			h.logger.OnLog(r, start, used, code) // TODO log err
+		}
+	}()
+
+	// new context
 	c, err := NewContext(w, r)
 	if err != nil {
-		h.responser.Response(c, err)
+		result = err
 		return
 	}
 
-	start := time.Now()
-
-	result := h.serve(c) // serve
-
-	used := time.Since(start)
-
-	code, err := h.responser.Response(c, result)
-
-	h.stat.onServe(code, used)
-
-	if h.logger != nil {
-		// TODO log err
-		h.logger.OnLog(r, start, used, code)
+	// parse params
+	err = ParseParams(c)
+	if err != nil {
+		result = err
+		return
 	}
+
+	result = h.serve(c) // serve
 	return
 }
 
@@ -89,6 +101,7 @@ func (h *WebHandler) serve(c *Context) (result interface{}) {
 		}
 	}()
 
+	// serve middlewares
 	err := h.midds.ServeMiddlewares(c)
 	if err != nil {
 		return err

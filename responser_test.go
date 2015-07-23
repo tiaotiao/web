@@ -30,10 +30,7 @@ func TestResponser(t *testing.T) {
 		responser := NewDefaultResponser()
 		w := httptest.NewRecorder()
 
-		c := new(Context)
-		c.ResponseWriter = w
-
-		code, err := responser.Response(c, tt.Result)
+		code, err := responser.Response(w, tt.Result)
 
 		if tt.Body != w.Body.String() {
 			t.Errorf("case %v: body = %v; want %v", i, w.Body, tt.Body)

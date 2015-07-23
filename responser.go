@@ -16,7 +16,7 @@ type Writeable interface {
 ///////////////////////////////////////////////////////////////////////////////
 
 type Responser interface {
-	Response(c *Context, result interface{}) (code int, err error)
+	Response(w http.ResponseWriter, result interface{}) (code int, err error)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -28,12 +28,11 @@ func NewDefaultResponser() *DefaultResponser {
 	return new(DefaultResponser)
 }
 
-func (r *DefaultResponser) Response(c *Context, result interface{}) (int, error) {
+func (r *DefaultResponser) Response(w http.ResponseWriter, result interface{}) (int, error) {
 	if result == nil {
 		return StatusOK, nil
 	}
 	var err error
-	w := c.ResponseWriter
 
 	switch v := result.(type) {
 	case []byte:
