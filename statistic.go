@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"net/http"
 	"sort"
+	"sync/atomic"
 	"time"
-	"wps.cn/lib/go/sync2"
 )
 
 type Stat struct {
-	Total    sync2.AtomicInt32 // Total requests count
-	Handling sync2.AtomicInt32 // Handling requests count
-	Handlers []*HandlerStat    // Stat of individual handler, which refers to WebHandler.stat
+	Total    int64          // Total requests count
+	Handling int64          // Handling requests count
+	Handlers []*HandlerStat // Stat of individual handler, which refers to WebHandler.stat
 }
 
 func newStat() *Stat {
@@ -21,61 +21,61 @@ func newStat() *Stat {
 }
 
 func (s *Stat) onServe(req *http.Request) {
-	s.Total.Add(1)
-	s.Handling.Add(1)
+	atomic.AddInt64(&s.Total, 1)
+	atomic.AddInt64(&s.Handling, 1)
 }
 
 func (s *Stat) onDone(req *http.Request) {
-	s.Handling.Add(-1)
+	atomic.AddInt64(&s.Handling, -1)
 }
 
 func (s *Stat) TopCount() []*HandlerStat {
 	return s.sortBy(func(a *HandlerStat, b *HandlerStat) bool {
-		return a.Count.Get() < b.Count.Get()
+		return a.Count < b.Count
 	})
 }
 
 func (s *Stat) TopCountOK() []*HandlerStat {
 	return s.sortBy(func(a *HandlerStat, b *HandlerStat) bool {
-		return a.CountOK.Get() < b.CountOK.Get()
+		return a.CountOK < b.CountOK
 	})
 }
 
 func (s *Stat) TopCountErrs() []*HandlerStat {
 	return s.sortBy(func(a *HandlerStat, b *HandlerStat) bool {
-		aCount := a.Count4XX.Get() + a.Count5XX.Get()
-		bCount := b.Count4XX.Get() + b.Count5XX.Get()
+		aCount := a.Count4XX + a.Count5XX
+		bCount := b.Count4XX + b.Count5XX
 		return aCount < bCount
 	})
 }
 
 func (s *Stat) TopCount4XXErrs() []*HandlerStat {
 	return s.sortBy(func(a *HandlerStat, b *HandlerStat) bool {
-		return a.Count4XX.Get() < b.Count4XX.Get()
+		return a.Count4XX < b.Count4XX
 	})
 }
 
 func (s *Stat) TopCount5XXErrs() []*HandlerStat {
 	return s.sortBy(func(a *HandlerStat, b *HandlerStat) bool {
-		return a.Count5XX.Get() < b.Count5XX.Get()
+		return a.Count5XX < b.Count5XX
 	})
 }
 
 func (s *Stat) TopAvgTime() []*HandlerStat {
 	return s.sortBy(func(a *HandlerStat, b *HandlerStat) bool {
-		return a.AverageTime.Get() < b.AverageTime.Get()
+		return a.AverageTime < b.AverageTime
 	})
 }
 
 func (s *Stat) TopMaxTime() []*HandlerStat {
 	return s.sortBy(func(a *HandlerStat, b *HandlerStat) bool {
-		return a.MaxTime.Get() < b.MaxTime.Get()
+		return a.MaxTime < b.MaxTime
 	})
 }
 
 func (s *Stat) TopUsedTime() []*HandlerStat {
 	return s.sortBy(func(a *HandlerStat, b *HandlerStat) bool {
-		return a.UsedTime.Get() < b.UsedTime.Get()
+		return a.UsedTime < b.UsedTime
 	})
 }
 
@@ -109,34 +109,34 @@ func (s *sortable) Less(i, j int) bool {
 
 type HandlerStat struct {
 	Path        string
-	Count       sync2.AtomicInt32
-	CountOK     sync2.AtomicInt32
-	Count4XX    sync2.AtomicInt32
-	Count5XX    sync2.AtomicInt32
-	AverageTime sync2.AtomicDuration
-	MaxTime     sync2.AtomicDuration
-	UsedTime    sync2.AtomicDuration
+	Count       int64
+	CountOK     int64
+	Count4XX    int64
+	Count5XX    int64
+	AverageTime int64
+	MaxTime     int64
+	UsedTime    int64
 }
 
 func (s *HandlerStat) onServe(code int, usedTime time.Duration) {
 
-	s.Count.Add(1)
+	atomic.AddInt64(&s.Count, 1)
 	if code < http.StatusBadRequest {
-		s.CountOK.Add(1)
+		atomic.AddInt64(&s.CountOK, 1)
 	} else if code < http.StatusInternalServerError {
-		s.Count4XX.Add(1)
+		atomic.AddInt64(&s.Count4XX, 1)
 	} else {
-		s.Count5XX.Add(1)
+		atomic.AddInt64(&s.Count5XX, 1)
 	}
 
-	s.UsedTime.Add(usedTime)
-	if s.MaxTime.Get() < usedTime {
-		s.MaxTime.Set(usedTime)
+	atomic.AddInt64(&s.UsedTime, int64(usedTime))
+	if s.MaxTime < int64(usedTime) {
+		atomic.StoreInt64(&s.MaxTime, int64(usedTime))
 	}
-	s.AverageTime.Set(s.UsedTime.Get() / time.Duration(s.Count.Get()))
+	atomic.StoreInt64(&s.AverageTime, s.UsedTime/s.Count)
 }
 
 func (s *HandlerStat) Format() string {
 	return fmt.Sprintf("%-40v\t count=%v,\t countok=%v,\t count4xx=%v,\t count5xx=%v,\t averagetime=%v,\t maxtime=%v,\t usedtime=%v",
-		"["+s.Path+"],", s.Count.Get(), s.CountOK.Get(), s.Count4XX.Get(), s.Count5XX.Get(), s.AverageTime.Get(), s.MaxTime.Get(), s.UsedTime.Get())
+		"["+s.Path+"],", s.Count, s.CountOK, s.Count4XX, s.Count5XX, s.AverageTime, s.MaxTime, s.UsedTime)
 }
