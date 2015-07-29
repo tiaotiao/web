@@ -46,17 +46,3 @@ func (r *router) SubRouter(pathPerfix string) Router {
 	midwares := r.midwares.Duplicate()
 	return newRouter(r.web, base, midwares)
 }
-
-///////////////////////////////////////////////////////////////////////////////
-
-const (
-	POST    = "POST"
-	GET     = "GET"
-	DELETE  = "DELETE"
-	PUT     = "PUT"
-	OPTIONS = "OPTIONS"
-)
-
-var (
-	ALL_METHODS = []string{GET, POST, DELETE, PUT, OPTIONS}
-)

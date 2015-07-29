@@ -9,13 +9,12 @@ type Middleware interface {
 	ServeMiddleware(c *Context) error
 }
 
-type ResponseProcessor interface {
-	ProcessResponse(c *Context, result interface{}) (interface{}, error)
+type ResponseMiddleware interface {
+	ServeResponse(c *Context, result interface{}) (interface{}, error)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-// Middleware define in middleware_interface.go
 type MiddlewaresManager struct {
 	midds []Middleware
 }
@@ -56,7 +55,7 @@ func (m *MiddlewaresManager) ServeMiddlewares(c *Context) (err error) {
 	return nil
 }
 
-func (m *MiddlewaresManager) ProcessResponse(c *Context, r interface{}) (rt interface{}) {
+func (m *MiddlewaresManager) ServeResponses(c *Context, r interface{}) (rt interface{}) {
 	defer func() {
 		if e := recover(); e != nil {
 			rt = NewErrorMsg("server error", fmt.Sprintf("Panic: %v", e, debug.Stack()), StatusInternalServerError)
@@ -65,8 +64,8 @@ func (m *MiddlewaresManager) ProcessResponse(c *Context, r interface{}) (rt inte
 
 	var err error
 	for _, midd := range m.midds {
-		if respProcessor, ok := midd.(ResponseProcessor); ok {
-			r, err = respProcessor.ProcessResponse(c, r)
+		if respProcessor, ok := midd.(ResponseMiddleware); ok {
+			r, err = respProcessor.ServeResponse(c, r)
 			if err != nil {
 				return err
 			}

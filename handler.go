@@ -113,7 +113,7 @@ func (h *WebHandler) serve(c *Context) (result interface{}) {
 	// call
 	result = h.call(c)
 
-	return h.midds.ProcessResponse(c, result)
+	return h.midds.ServeResponses(c, result)
 }
 
 func (h *WebHandler) call(c *Context) (result interface{}) {

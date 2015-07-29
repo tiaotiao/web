@@ -124,19 +124,3 @@ func ParseParams(c *Context) error {
 
 	return nil
 }
-
-func ValidateContentType(contentType string) bool {
-	if contentType == "" {
-		return true
-	}
-
-	for _, ct := range validContentTypes {
-		if strings.Contains(contentType, ct) {
-			return true
-		}
-	}
-
-	return false
-}
-
-var validContentTypes = []string{"", "text/html", "text/plain", "text", "application/x-www-form-urlencoded", "application/json", "multipart/form-data"}

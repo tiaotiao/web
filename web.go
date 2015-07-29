@@ -132,16 +132,16 @@ func (w *Web) Handle(method string, path string, fn WebFunc) *MiddlewaresManager
 	return w.router.Handle(method, path, fn)
 }
 
+func (w *Web) SubRouter(pathPerfix string) Router {
+	return w.router.SubRouter(pathPerfix)
+}
+
 func (w *Web) SetResponser(r Responser) {
 	w.responser = r
 }
 
 func (w *Web) SetLogger(l Logger) {
 	w.logger = l
-}
-
-func (w *Web) SubRouter(pathPerfix string) Router {
-	return w.router.SubRouter(pathPerfix)
 }
 
 func (w *Web) GetStatistic() *Stat {
@@ -171,7 +171,7 @@ func (w *Web) handle(method, urlpath string, fn WebFunc, midwares *MiddlewaresMa
 	} else {
 		rt = w.mux.Handle(urlpath, h)
 	}
-	rt.Methods(method)
+	rt.Methods(strings.ToUpper(method))
 
 	// add to map
 	url := methodUrl(method, urlpath)
@@ -189,3 +189,11 @@ func (w *Web) handle(method, urlpath string, fn WebFunc, midwares *MiddlewaresMa
 func methodUrl(method string, path string) string {
 	return method + " " + strings.ToLower(path)
 }
+
+const (
+	POST    = "POST"
+	GET     = "GET"
+	DELETE  = "DELETE"
+	PUT     = "PUT"
+	OPTIONS = "OPTIONS"
+)
