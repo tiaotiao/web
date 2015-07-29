@@ -60,7 +60,6 @@ type Web struct {
 
 	responser Responser
 	logger    Logger
-	stat      *Stat
 
 	wg     sync.WaitGroup
 	closed bool
@@ -78,7 +77,6 @@ func NewWeb() *Web {
 
 	w.responser = new(DefaultResponser)
 
-	w.stat = newStat()
 	w.closed = false
 	return w
 }
@@ -87,11 +85,7 @@ func NewWeb() *Web {
 func (w *Web) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	w.wg.Add(1)
 	if !w.closed {
-		w.stat.onServe(req)
-
 		w.mux.ServeHTTP(rw, req)
-
-		w.stat.onDone(req)
 	}
 	w.wg.Done()
 }
@@ -200,11 +194,6 @@ func (w *Web) SetLogger(l Logger) {
 	w.logger = l
 }
 
-// Get statistic.
-func (w *Web) GetStatistic() *Stat {
-	return w.stat
-}
-
 // Get all registed handlers.
 func (w *Web) GetHandlers() map[string]*WebHandler {
 	return w.handlers
@@ -238,9 +227,6 @@ func (w *Web) handle(method, urlpath string, fn WebFunc, midwares *middlewaresMa
 		panic("url conflict: " + url)
 	}
 	w.handlers[url] = h
-
-	h.stat.Path = url
-	w.stat.Handlers = append(w.stat.Handlers, h.stat)
 	return
 }
 

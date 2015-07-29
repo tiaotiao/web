@@ -26,8 +26,6 @@ type WebHandler struct {
 
 	responser Responser
 	logger    Logger
-
-	stat *HandlerStat
 }
 
 func newWebHandler(fn WebFunc, midds *middlewaresManager, responser Responser, logger Logger) *WebHandler {
@@ -39,8 +37,6 @@ func newWebHandler(fn WebFunc, midds *middlewaresManager, responser Responser, l
 	h.fn = fn
 
 	h.midds = midds
-
-	h.stat = new(HandlerStat)
 
 	if responser == nil {
 		panic("responser == nil")
@@ -70,8 +66,6 @@ func (h *WebHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			result = err
 		}
-
-		h.stat.onServe(code, used)
 
 		if h.logger != nil {
 			h.logger.OnLog(r, start, used, code, result)
