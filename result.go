@@ -33,24 +33,6 @@ var _ StatusCode = (*Result)(nil)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-type Message struct {
-	Message string `json:"message"`
-	Code    int    `json:"-"`
-}
-
-func NewMessage(msg string, code int) *Message {
-	e := &Message{Message: msg, Code: code}
-	return e
-}
-
-func (e *Message) StatusCode() int {
-	return e.Code
-}
-
-var _ StatusCode = (*Message)(nil)
-
-///////////////////////////////////////////////////////////////////////////////
-
 type Error struct {
 	Err     string `json:"error"`
 	Message string `json:"message,omitempty"`

@@ -28,10 +28,10 @@ type Router interface {
 	// All middlewares already in this router will be applied to this handler. But new
 	// middlewares after will not affect. It will panic if you handle two functions with
 	// the same url.
-	Handle(method string, path string, fn WebFunc) *middlewaresManager
+	Handle(method string, path string, fn WebFunc) *MiddlewaresManager
 
 	// Append a middleware to this router. Middlewares will applied to handler in sequence.
-	Append(midd Middleware) *middlewaresManager
+	Append(midd Middleware)
 
 	// Get a sub router with add this path. Note that the base path of sub router
 	// is based on current base path. Middlewares in the sub router is a copy of
@@ -42,10 +42,10 @@ type Router interface {
 type router struct {
 	web      *Web
 	base     string
-	midwares *middlewaresManager
+	midwares *MiddlewaresManager
 }
 
-func newRouter(web *Web, basePath string, midwares *middlewaresManager) *router {
+func newRouter(web *Web, basePath string, midwares *MiddlewaresManager) *router {
 	if midwares == nil {
 		midwares = newMiddlewaresManager()
 	}
@@ -56,12 +56,12 @@ func newRouter(web *Web, basePath string, midwares *middlewaresManager) *router 
 	return r
 }
 
-func (r *router) Append(midd Middleware) *middlewaresManager {
-	return r.midwares.Append(midd)
+func (r *router) Append(midd Middleware) {
+	r.midwares.Append(midd)
 }
 
-func (r *router) Handle(method string, urlpath string, fn WebFunc) *middlewaresManager {
-	midwares := r.midwares.Duplicate() // copy one
+func (r *router) Handle(method string, urlpath string, fn WebFunc) *MiddlewaresManager {
+	midwares := r.midwares.duplicate() // copy one
 	urlpath = path.Join(r.base, urlpath)
 
 	r.web.handle(method, urlpath, fn, midwares)
@@ -71,6 +71,8 @@ func (r *router) Handle(method string, urlpath string, fn WebFunc) *middlewaresM
 
 func (r *router) SubRouter(basePath string) Router {
 	base := path.Join(r.base, basePath)
-	midwares := r.midwares.Duplicate()
+	midwares := r.midwares.duplicate()
 	return newRouter(r.web, base, midwares)
 }
+
+var _ Router = (*router)(nil)

@@ -15,17 +15,17 @@ type ResponseMiddleware interface {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-type middlewaresManager struct {
+type MiddlewaresManager struct {
 	midds []Middleware
 }
 
-func newMiddlewaresManager() *middlewaresManager {
-	m := new(middlewaresManager)
+func newMiddlewaresManager() *MiddlewaresManager {
+	m := new(MiddlewaresManager)
 	m.midds = make([]Middleware, 0, 8)
 	return m
 }
 
-func (m *middlewaresManager) Append(midd Middleware) *middlewaresManager {
+func (m *MiddlewaresManager) Append(midd Middleware) *MiddlewaresManager {
 	if midd == nil {
 		return m
 	}
@@ -33,13 +33,13 @@ func (m *middlewaresManager) Append(midd Middleware) *middlewaresManager {
 	return m
 }
 
-func (m *middlewaresManager) Duplicate() *middlewaresManager {
+func (m *MiddlewaresManager) duplicate() *MiddlewaresManager {
 	d := newMiddlewaresManager()
 	copy(d.midds, m.midds)
 	return d
 }
 
-func (m *middlewaresManager) ServeMiddlewares(c *Context) (err error) {
+func (m *MiddlewaresManager) serveMiddlewares(c *Context) (err error) {
 	defer func() {
 		if e := recover(); e != nil {
 			err = NewErrorMsg("server error", fmt.Sprintf("Panic: %v\n%v", e, debug.Stack()), StatusInternalServerError)
@@ -55,7 +55,7 @@ func (m *middlewaresManager) ServeMiddlewares(c *Context) (err error) {
 	return nil
 }
 
-func (m *middlewaresManager) ServeResponses(c *Context, r interface{}) (rt interface{}) {
+func (m *MiddlewaresManager) serveResponses(c *Context, r interface{}) (rt interface{}) {
 	defer func() {
 		if e := recover(); e != nil {
 			rt = NewErrorMsg("server error", fmt.Sprintf("Panic: %v", e, debug.Stack()), StatusInternalServerError)

@@ -22,13 +22,13 @@ type WebHandler struct {
 	reflectFn      reflect.Value
 	reflectArgType reflect.Type
 
-	midds *middlewaresManager
+	midds *MiddlewaresManager
 
 	responser Responser
 	logger    Logger
 }
 
-func newWebHandler(fn WebFunc, midds *middlewaresManager, responser Responser, logger Logger) *WebHandler {
+func newWebHandler(fn WebFunc, midds *MiddlewaresManager, responser Responser, logger Logger) *WebHandler {
 	h := new(WebHandler)
 
 	if fn == nil {
@@ -99,7 +99,7 @@ func (h *WebHandler) serve(c *Context) (result interface{}) {
 	}()
 
 	// serve middlewares
-	err := h.midds.ServeMiddlewares(c)
+	err := h.midds.serveMiddlewares(c)
 	if err != nil {
 		return err
 	}
@@ -107,7 +107,7 @@ func (h *WebHandler) serve(c *Context) (result interface{}) {
 	// call
 	result = h.call(c)
 
-	return h.midds.ServeResponses(c, result)
+	return h.midds.serveResponses(c, result)
 }
 
 func (h *WebHandler) call(c *Context) (result interface{}) {

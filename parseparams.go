@@ -9,6 +9,7 @@ import (
 	"mime"
 	"mime/multipart"
 	"net/http"
+	"net/textproto"
 	"net/url"
 	"strings"
 
@@ -86,7 +87,12 @@ func ParseParams(c *Context) error {
 					return err
 				}
 
-				part := new(Part)
+				part := new(struct {
+					FormName string
+					FileName string
+					Header   textproto.MIMEHeader
+					Data     []byte
+				})
 				part.FormName = p.FormName()
 				part.FileName = p.FileName()
 				part.Header = p.Header

@@ -20,14 +20,12 @@ type Context struct {
 
 	RawPostData []byte
 
-	Multipart []*Part
-}
-
-type Part struct {
-	FormName string
-	FileName string
-	Header   textproto.MIMEHeader
-	Data     []byte
+	Multipart []*struct {
+		FormName string
+		FileName string
+		Header   textproto.MIMEHeader
+		Data     []byte
+	}
 }
 
 func newContext(w http.ResponseWriter, r *http.Request) (*Context, error) {
