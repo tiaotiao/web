@@ -28,10 +28,10 @@ type Router interface {
 	// All middlewares already in this router will be applied to this handler. But new
 	// middlewares after will not affect. It will panic if you handle two functions with
 	// the same url.
-	Handle(method string, path string, fn WebFunc) *MiddlewaresManager
+	Handle(method string, path string, fn WebFunc) *middlewaresManager
 
 	// Append a middleware to this router. Middlewares will applied to handler in sequence.
-	Append(midd Middleware) *MiddlewaresManager
+	Append(midd Middleware) *middlewaresManager
 
 	// Get a sub router with add this path. Note that the base path of sub router
 	// is based on current base path. Middlewares in the sub router is a copy of
@@ -42,10 +42,10 @@ type Router interface {
 type router struct {
 	web      *Web
 	base     string
-	midwares *MiddlewaresManager
+	midwares *middlewaresManager
 }
 
-func newRouter(web *Web, basePath string, midwares *MiddlewaresManager) *router {
+func newRouter(web *Web, basePath string, midwares *middlewaresManager) *router {
 	if midwares == nil {
 		midwares = newMiddlewaresManager()
 	}
@@ -56,11 +56,11 @@ func newRouter(web *Web, basePath string, midwares *MiddlewaresManager) *router 
 	return r
 }
 
-func (r *router) Append(midd Middleware) *MiddlewaresManager {
+func (r *router) Append(midd Middleware) *middlewaresManager {
 	return r.midwares.Append(midd)
 }
 
-func (r *router) Handle(method string, urlpath string, fn WebFunc) *MiddlewaresManager {
+func (r *router) Handle(method string, urlpath string, fn WebFunc) *middlewaresManager {
 	midwares := r.midwares.Duplicate() // copy one
 	urlpath = path.Join(r.base, urlpath)
 

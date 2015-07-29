@@ -22,7 +22,7 @@ type WebHandler struct {
 	reflectFn      reflect.Value
 	reflectArgType reflect.Type
 
-	midds *MiddlewaresManager
+	midds *middlewaresManager
 
 	responser Responser
 	logger    Logger
@@ -30,7 +30,7 @@ type WebHandler struct {
 	stat *HandlerStat
 }
 
-func newWebHandler(fn WebFunc, midds *MiddlewaresManager, responser Responser, logger Logger) *WebHandler {
+func newWebHandler(fn WebFunc, midds *middlewaresManager, responser Responser, logger Logger) *WebHandler {
 	h := new(WebHandler)
 
 	if fn == nil {

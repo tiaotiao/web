@@ -172,7 +172,7 @@ func (w *Web) Close() {
 }
 
 // Register an WebFunc as a handler for this url. See Router.Handle
-func (w *Web) Handle(method string, path string, fn WebFunc) *MiddlewaresManager {
+func (w *Web) Handle(method string, path string, fn WebFunc) *middlewaresManager {
 	return w.router.Handle(method, path, fn)
 }
 
@@ -182,8 +182,8 @@ func (w *Web) SubRouter(pathPerfix string) Router {
 }
 
 // Append a middleware. See Router.Append
-func (w *Web) Append(midd Middleware) {
-	w.router.Append(midd)
+func (w *Web) Append(midd Middleware) *middlewaresManager {
+	return w.router.Append(midd)
 }
 
 // To setup a custom responser to process the result which returned from WebFunc and then to write into response body.
@@ -210,7 +210,7 @@ func (w *Web) GetHandlers() map[string]*WebHandler {
 	return w.handlers
 }
 
-func (w *Web) handle(method, urlpath string, fn WebFunc, midwares *MiddlewaresManager) {
+func (w *Web) handle(method, urlpath string, fn WebFunc, midwares *middlewaresManager) {
 	var h *WebHandler
 
 	h = newWebHandler(fn, midwares, w.responser, w.logger)
@@ -257,3 +257,5 @@ const (
 	PUT     = "PUT"
 	OPTIONS = "OPTIONS"
 )
+
+var _ Router = (*Web)(nil)
