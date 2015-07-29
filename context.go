@@ -6,13 +6,11 @@ import (
 	"net/textproto"
 	"strconv"
 	"sync/atomic"
-
-	"github.com/tiaotiao/go/guid"
 )
 
 const MaxBodyLength int64 = 20 * (1 << 20) // 20M
 
-var globalReqId = guid.Next()
+var globalReqId int64
 
 type Context struct {
 	Request   *http.Request
