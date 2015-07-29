@@ -48,7 +48,7 @@ func TestServeHttp(t *testing.T) {
 
 	tal := testLogger{}
 
-	wh := newWebHandler(th.Get, mm, new(DefaultResponser), tal)
+	wh := newHandler(th.Get, mm, new(DefaultResponser), tal)
 	rw := httptest.NewRecorder()
 	r, err := http.NewRequest("GET", "http://local/test", strings.NewReader("t1=v1"))
 	checkErr(err)

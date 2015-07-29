@@ -23,12 +23,12 @@ import (
 //	r3.Handle("DELETE", "/del", DelMessage) // DELETE /api/message/del, with AuthMiddleware
 //
 type Router interface {
-	// Register the WebFunc to handle this url. Method can be http methods like "GET", "POST",
+	// Register the Handler to handle this url. Method can be http methods like "GET", "POST",
 	// "DELETE" etc, case insensitive. The path is related to the base path of this router.
 	// All middlewares already in this router will be applied to this handler. But new
 	// middlewares after will not affect. It will panic if you handle two functions with
 	// the same url.
-	Handle(method string, path string, fn WebFunc) *MiddlewaresManager
+	Handle(method string, path string, fn Handler) *MiddlewaresManager
 
 	// Append a middleware to this router. Middlewares will applied to handler in sequence.
 	Append(midd Middleware)
@@ -60,7 +60,7 @@ func (r *router) Append(midd Middleware) {
 	r.midwares.Append(midd)
 }
 
-func (r *router) Handle(method string, urlpath string, fn WebFunc) *MiddlewaresManager {
+func (r *router) Handle(method string, urlpath string, fn Handler) *MiddlewaresManager {
 	midwares := r.midwares.duplicate() // copy one
 	urlpath = path.Join(r.base, urlpath)
 

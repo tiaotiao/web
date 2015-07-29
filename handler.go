@@ -12,12 +12,12 @@ type Logger interface {
 	OnLog(r *http.Request, start time.Time, used time.Duration, code int, result interface{})
 }
 
-type WebFunc interface{}
+type Handler interface{}
 
 ///////////////////////////////////////////////////////////////////////////////
 
-type WebHandler struct {
-	fn WebFunc
+type handler struct {
+	fn Handler
 
 	reflectFn      reflect.Value
 	reflectArgType reflect.Type
@@ -28,8 +28,8 @@ type WebHandler struct {
 	logger    Logger
 }
 
-func newWebHandler(fn WebFunc, midds *MiddlewaresManager, responser Responser, logger Logger) *WebHandler {
-	h := new(WebHandler)
+func newHandler(fn Handler, midds *MiddlewaresManager, responser Responser, logger Logger) *handler {
+	h := new(handler)
 
 	if fn == nil {
 		panic("func is nil")
@@ -45,7 +45,7 @@ func newWebHandler(fn WebFunc, midds *MiddlewaresManager, responser Responser, l
 
 	h.logger = logger
 
-	err := h.validateFunc(fn)
+	err := h.validateHandler(fn)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -53,7 +53,7 @@ func newWebHandler(fn WebFunc, midds *MiddlewaresManager, responser Responser, l
 	return h
 }
 
-func (h *WebHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var err error
 	var result interface{}
 	var start = time.Now()
@@ -90,7 +90,7 @@ func (h *WebHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func (h *WebHandler) serve(c *Context) (result interface{}) {
+func (h *handler) serve(c *Context) (result interface{}) {
 	defer func() {
 		if e := recover(); e != nil {
 			s := fmt.Sprintf("Panic: %v\n %v", e, debug.Stack())
@@ -110,7 +110,7 @@ func (h *WebHandler) serve(c *Context) (result interface{}) {
 	return h.midds.serveResponses(c, result)
 }
 
-func (h *WebHandler) call(c *Context) (result interface{}) {
+func (h *handler) call(c *Context) (result interface{}) {
 	var in = make([]reflect.Value, 0, 2)
 
 	in = append(in, reflect.ValueOf(c))
@@ -131,7 +131,7 @@ func (h *WebHandler) call(c *Context) (result interface{}) {
 	return outs[0].Interface()
 }
 
-func (h *WebHandler) validateFunc(fn WebFunc) error {
+func (h *handler) validateHandler(fn Handler) error {
 	v := reflect.ValueOf(fn)
 	t := reflect.TypeOf(fn)
 

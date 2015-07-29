@@ -54,7 +54,7 @@ type Web struct {
 	mux    *mux.Router
 	router *router
 
-	handlers map[string]*WebHandler
+	handlers map[string]*handler
 
 	listeners []net.Listener
 
@@ -73,7 +73,7 @@ func NewWeb() *Web {
 
 	w.router = newRouter(w, "/", nil)
 
-	w.handlers = make(map[string]*WebHandler, 128)
+	w.handlers = make(map[string]*handler, 128)
 
 	w.responser = new(DefaultResponser)
 
@@ -165,8 +165,8 @@ func (w *Web) Close() {
 	w.wg.Wait()
 }
 
-// Register an WebFunc as a handler for this url. See Router.Handle
-func (w *Web) Handle(method string, path string, fn WebFunc) *MiddlewaresManager {
+// Register an Handler as a handler for this url. See Router.Handle
+func (w *Web) Handle(method string, path string, fn Handler) *MiddlewaresManager {
 	return w.router.Handle(method, path, fn)
 }
 
@@ -180,7 +180,7 @@ func (w *Web) Append(midd Middleware) {
 	w.router.Append(midd)
 }
 
-// To setup a custom responser to process the result which returned from WebFunc and then to write into response body.
+// To setup a custom responser to process the result which returned from Handler and then to write into response body.
 // The responser must implements the Responser interface.
 //
 // With out doing anything, the DefaultResponser will write string and []byte directly or write map, struct and
@@ -195,14 +195,14 @@ func (w *Web) SetLogger(l Logger) {
 }
 
 // Get all registed handlers.
-func (w *Web) GetHandlers() map[string]*WebHandler {
-	return w.handlers
-}
+// func (w *Web) GetHandlers() map[string]*handler {
+// 	return w.handlers
+// }
 
-func (w *Web) handle(method, urlpath string, fn WebFunc, midwares *MiddlewaresManager) {
-	var h *WebHandler
+func (w *Web) handle(method, urlpath string, fn Handler, midwares *MiddlewaresManager) {
+	var h *handler
 
-	h = newWebHandler(fn, midwares, w.responser, w.logger)
+	h = newHandler(fn, midwares, w.responser, w.logger)
 
 	// match prefix
 	var prefix bool
