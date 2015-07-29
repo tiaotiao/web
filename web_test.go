@@ -119,7 +119,7 @@ func TestWeb(t *testing.T) {
 	sr := r.SubRouter("sub")
 	m2 := sr.Handle("GET", "/routerHandle", h.Get)
 	m2.Append(new(middWareLog))
-	m2.Remove("auth")
+	// m2.Remove("auth")
 	resp, err := http.Get("http://localhost:8095/sub/routerHandle")
 	checkErr(err)
 	checkResponse(resp, http.StatusOK, "ok", t)

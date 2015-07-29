@@ -6,7 +6,6 @@ import (
 )
 
 type Middleware interface {
-	Name() string
 	ServeMiddleware(c *Context) error
 }
 
@@ -33,34 +32,6 @@ func (m *MiddlewaresManager) Append(midd Middleware) *MiddlewaresManager {
 	}
 	m.midds = append(m.midds, midd)
 	return m
-}
-
-func (m *MiddlewaresManager) Clear() {
-	m.midds = make([]Middleware, 0, 8)
-}
-
-func (m *MiddlewaresManager) Remove(name string) bool {
-	var ok bool
-	for i, midd := range m.midds {
-		if midd.Name() == name {
-			m.midds = removeFromList(m.midds, i)
-			ok = true
-			break
-		}
-	}
-	return ok
-}
-
-func removeFromList(midds []Middleware, x int) []Middleware {
-	if x < 0 || len(midds) <= x {
-		return midds
-	}
-	midds[x] = nil
-	for i := x + 1; i < len(midds); i++ {
-		midds[i-1] = midds[i]
-		midds[i] = nil
-	}
-	return midds[:len(midds)-1]
 }
 
 func (m *MiddlewaresManager) Duplicate() *MiddlewaresManager {

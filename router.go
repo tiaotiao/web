@@ -5,10 +5,10 @@ import (
 )
 
 type Router interface {
-	Append(midd Middleware) *MiddlewaresManager
 	Handle(method string, path string, fn WebFunc) *MiddlewaresManager
+
+	Append(midd Middleware) *MiddlewaresManager
 	SubRouter(pathPerfix string) Router
-	Clear()
 }
 
 type router struct {
@@ -30,10 +30,6 @@ func newRouter(web *Web, basePath string, midwares *MiddlewaresManager) *router 
 
 func (r *router) Append(midd Middleware) *MiddlewaresManager {
 	return r.midwares.Append(midd)
-}
-
-func (r *router) Clear() {
-	r.midwares.Clear()
 }
 
 func (r *router) Handle(method string, urlpath string, fn WebFunc) *MiddlewaresManager {

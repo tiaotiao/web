@@ -124,10 +124,6 @@ func (w *Web) Close() {
 	w.wg.Wait()
 }
 
-func (w *Web) Clear() {
-	w.router.Clear()
-}
-
 func (w *Web) Append(midd Middleware) {
 	w.router.Append(midd)
 }
