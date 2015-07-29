@@ -9,31 +9,33 @@ import (
 //
 // Example:
 //
-// 	w := web.NewWeb()				// w based on /
+// 	w := web.NewWeb()              // w based on /
 //
-// 	r1 := w.SubRouter("/api")		// r1 based on /api
-// 	r2 := r1.SubRouter("message")	// r2 based on /api/message
-//	r2.Append(NewAuthMiddleware())	// r2 add AuthMiddleware
-//	r3 := r2.SubRouter("/")			// r3 based on /api/message, with AuthMiddleware. The same as r2.
+// 	r1 := w.SubRouter("/api")      // r1 based on /api
+// 	r2 := r1.SubRouter("message")  // r2 based on /api/message
+//	r2.Append(NewAuthMiddleware()) // r2 add AuthMiddleware
+//	r3 := r2.SubRouter("/")        // r3 based on /api/message, with AuthMiddleware. The same as r2.
 //
-//	r2.Append(NewRateLimitMiddleware())	// r2 add RateLimitMiddleware
+//	r2.Append(NewRateLimitMiddleware())     // r2 add RateLimitMiddleware
 //
-//	r1.Handle("GET", "/status", Status)		// GET		/api/status, without Middleware
-//	r2.Handle("POST", "/add", AddMessage)	// POST		/api/message/add, with AuthMiddleware and RateLimitMiddleware
-//	r3.Handle("DELETE", "/del", DelMessage)	// DELETE	/api/message/del, with AuthMiddleware
+//	r1.Handle("GET", "/status", Status)     // GET    /api/status, without Middleware
+//	r2.Handle("POST", "/add", AddMessage)   // POST   /api/message/add, with AuthMiddleware and RateLimitMiddleware
+//	r3.Handle("DELETE", "/del", DelMessage) // DELETE /api/message/del, with AuthMiddleware
 //
 type Router interface {
 	// Register the WebFunc to handle this url. Method can be http methods like "GET", "POST",
 	// "DELETE" etc, case insensitive. The path is related to the base path of this router.
-	// All middlewares already in this router will be applied to this handler. But new middlewares
-	// after will not affect. It will panic if you handle two functions with the same url.
+	// All middlewares already in this router will be applied to this handler. But new
+	// middlewares after will not affect. It will panic if you handle two functions with
+	// the same url.
 	Handle(method string, path string, fn WebFunc) *MiddlewaresManager
 
 	// Append a middleware to this router. Middlewares will applied to handler in sequence.
 	Append(midd Middleware) *MiddlewaresManager
 
-	// Get a sub router with add this path. Note that the base path of sub router is based on current base path.
-	// Middlewares in the sub router is a copy of this router. But after this, they will be independent with each other.
+	// Get a sub router with add this path. Note that the base path of sub router
+	// is based on current base path. Middlewares in the sub router is a copy of
+	// this router. But after this, they will be independent with each other.
 	SubRouter(path string) Router
 }
 
