@@ -76,7 +76,7 @@ func NewWeb() *Web {
 
 	w.handlers = make(map[string]*WebHandler, 128)
 
-	w.responser = NewDefaultResponser()
+	w.responser = new(DefaultResponser)
 
 	w.stat = newStat()
 	w.closed = false
@@ -213,7 +213,7 @@ func (w *Web) GetHandlers() map[string]*WebHandler {
 func (w *Web) handle(method, urlpath string, fn WebFunc, midwares *MiddlewaresManager) {
 	var h *WebHandler
 
-	h = NewWebHandler(fn, midwares, w.responser, w.logger)
+	h = newWebHandler(fn, midwares, w.responser, w.logger)
 
 	// match prefix
 	var prefix bool

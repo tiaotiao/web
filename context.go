@@ -4,13 +4,10 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/textproto"
-	"strconv"
 	"sync/atomic"
 )
 
-const MaxBodyLength int64 = 20 * (1 << 20) // 20M
-
-var globalReqId int64
+var MaxBodyLength int64 = 20 * (1 << 20) // 20M
 
 type Context struct {
 	Request   *http.Request
@@ -33,7 +30,7 @@ type Part struct {
 	Data     []byte
 }
 
-func NewContext(w http.ResponseWriter, r *http.Request) (*Context, error) {
+func newContext(w http.ResponseWriter, r *http.Request) (*Context, error) {
 	var err error
 
 	c := new(Context)
@@ -62,79 +59,4 @@ func NewContext(w http.ResponseWriter, r *http.Request) (*Context, error) {
 	return c, nil
 }
 
-func (c *Context) Set(name string, val interface{}) {
-	c.Values[name] = val
-}
-
-func (c *Context) Get(name string) (interface{}, bool) {
-	v, ok := c.Values[name]
-	if ok {
-		return v, true
-	}
-
-	s := c.Request.FormValue(name)
-	if s != "" {
-		return s, true
-	}
-
-	v, ok = c.Request.Form[name]
-	if ok {
-		return v, true
-	}
-
-	return nil, false
-}
-
-func (c *Context) GetInt(name string) (int, bool) {
-	v, ok := c.Get(name)
-	if !ok {
-		return 0, false
-	}
-
-	switch x := v.(type) {
-	case int:
-		return x, true
-	case string:
-		i, err := strconv.Atoi(x)
-		if err != nil {
-			return 0, false
-		}
-		return i, true
-	}
-
-	return 0, false
-}
-
-func (c *Context) GetInt64(name string) (int64, bool) {
-	v, ok := c.Get(name)
-	if !ok {
-		return 0, false
-	}
-
-	switch x := v.(type) {
-	case int64:
-		return x, true
-	case string:
-		i, err := strconv.ParseInt(x, 10, 64)
-		if err != nil {
-			return 0, false
-		}
-		return i, true
-	}
-
-	return 0, false
-}
-
-func (c *Context) GetString(name string) (string, bool) {
-	v, ok := c.Get(name)
-	if !ok {
-		return "", false
-	}
-
-	s, ok := v.(string)
-	if !ok {
-		return "", false
-	}
-
-	return s, true
-}
+var globalReqId int64

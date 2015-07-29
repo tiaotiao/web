@@ -27,7 +27,7 @@ func TestResponser(t *testing.T) {
 	}
 
 	for i, tt := range testCases {
-		responser := NewDefaultResponser()
+		responser := new(DefaultResponser)
 		w := httptest.NewRecorder()
 
 		code, err := responser.Response(w, tt.Result)

@@ -24,10 +24,6 @@ type Responser interface {
 type DefaultResponser struct {
 }
 
-func NewDefaultResponser() *DefaultResponser {
-	return new(DefaultResponser)
-}
-
 func (r *DefaultResponser) Response(w http.ResponseWriter, result interface{}) (int, error) {
 	if result == nil {
 		return StatusOK, nil

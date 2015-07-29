@@ -30,7 +30,7 @@ type WebHandler struct {
 	stat *HandlerStat
 }
 
-func NewWebHandler(fn WebFunc, midds *MiddlewaresManager, responser Responser, logger Logger) *WebHandler {
+func newWebHandler(fn WebFunc, midds *MiddlewaresManager, responser Responser, logger Logger) *WebHandler {
 	h := new(WebHandler)
 
 	if fn == nil {
@@ -79,7 +79,7 @@ func (h *WebHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}()
 
 	// new context
-	c, err := NewContext(w, r)
+	c, err := newContext(w, r)
 	if err != nil {
 		result = err
 		return

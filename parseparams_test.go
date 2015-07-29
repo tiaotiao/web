@@ -11,18 +11,24 @@ var context *Context
 
 func serve(w http.ResponseWriter, r *http.Request) {
 
-	context, _ = NewContext(w, r)
+	context, _ = newContext(w, r)
 
 	ParseParams(context)
 }
 
 func checkparam(key string, val string, t *testing.T) {
-	if v, ok := context.GetString(key); ok {
-		if v != val {
-			t.Error("param '", key, "' !=", val)
-		}
-	} else {
+	vv, ok := context.Values[key]
+	if !ok {
 		t.Error("param '", key, "' not found")
+		return
+	}
+	v, ok := vv.(string)
+	if !ok {
+		t.Error("param '", key, "' not string")
+		return
+	}
+	if v != val {
+		t.Error("param '", key, "' !=", val)
 	}
 }
 

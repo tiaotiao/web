@@ -136,7 +136,7 @@ func (s *HandlerStat) onServe(code int, usedTime time.Duration) {
 	atomic.StoreInt64(&s.AverageTime, s.UsedTime/s.Count)
 }
 
-func (s *HandlerStat) Format() string {
+func (s *HandlerStat) String() string {
 	return fmt.Sprintf("%-40v\t count=%v,\t countok=%v,\t count4xx=%v,\t count5xx=%v,\t averagetime=%v,\t maxtime=%v,\t usedtime=%v",
 		"["+s.Path+"],", s.Count, s.CountOK, s.Count4XX, s.Count5XX, s.AverageTime, s.MaxTime, s.UsedTime)
 }
