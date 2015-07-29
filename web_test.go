@@ -98,13 +98,14 @@ func TestWeb(t *testing.T) {
 
 	r := NewWeb()
 	r.Append(new(middWareAuth))
+	// r.Append(new(middWareLog))
 
 	h := new(testRouterHandle)
 	client := &http.Client{}
-	for _, tc := range testCases {
-		m := r.Handle(tc.r.URL.Path, h)
-		m.Append(new(middWareLog))
-	}
+	r.Handle("GET", "/routerGet", h.Get)
+	r.Handle("PUT", "/routerPut", h.Put)
+	r.Handle("POST", "/routerPost", h.Post)
+	r.Handle("DELETE", "/routerDelete", h.Delete)
 
 	go http.ListenAndServe(":8095", r)
 
@@ -116,7 +117,7 @@ func TestWeb(t *testing.T) {
 
 	// sub router
 	sr := r.SubRouter("sub")
-	m2 := sr.Handle("/routerHandle", new(testRouterHandle))
+	m2 := sr.Handle("GET", "/routerHandle", h.Get)
 	m2.Append(new(middWareLog))
 	m2.Remove("auth")
 	resp, err := http.Get("http://localhost:8095/sub/routerHandle")
@@ -135,7 +136,7 @@ func TestWeb(t *testing.T) {
 
 	// prefix router
 	r.SubRouter("pathPerfix")
-	r.Handle("/prefixrouter/*", new(testRouterHandle)) // Handle a path end with '/*'
+	r.Handle("GET", "/prefixrouter/*", h.Get) // Handle a path end with '/*'
 	resp, err = http.Get("http://localhost:8095/prefixrouter/123123/asdasdf/123123/sdgf")
 	checkErr(err)
 	checkResponse(resp, http.StatusOK, "ok", t)

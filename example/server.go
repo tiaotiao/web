@@ -40,9 +40,9 @@ func (s *Server) init() {
 }
 
 func (s *Server) registerURLs() {
-	s.web.HandleFunc("GET", "/api/message", s.api.GetMessage)
-	s.web.HandleFunc("GET", "/api/message/list", s.api.GetMessages)
-	s.web.HandleFunc("GET", "/api/message/add", s.api.PostMessage)
+	s.web.Handle("GET", "/api/message", s.api.GetMessage)
+	s.web.Handle("GET", "/api/message/list", s.api.GetMessages)
+	s.web.Handle("GET", "/api/message/add", s.api.PostMessage)
 }
 
 func (s *Server) OnLog(r *http.Request, start time.Time, used time.Duration, code int, result interface{}) {

@@ -132,12 +132,8 @@ func (w *Web) Append(midd Middleware) {
 	w.router.Append(midd)
 }
 
-func (w *Web) Handle(path string, handler interface{}) *MiddlewaresManager {
-	return w.router.Handle(path, handler)
-}
-
-func (w *Web) HandleFunc(method string, path string, fn WebFunc) *MiddlewaresManager {
-	return w.router.HandleFunc(method, path, fn)
+func (w *Web) Handle(method string, path string, fn WebFunc) *MiddlewaresManager {
+	return w.router.Handle(method, path, fn)
 }
 
 func (w *Web) SetResponser(r Responser) {
