@@ -28,6 +28,12 @@ type Context struct {
 	}
 }
 
+func (c *Context) Scheme(ptrArgs interface{}) error {
+	return Scheme(c.Values, ptrArgs)
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
 func newContext(w http.ResponseWriter, r *http.Request) (*Context, error) {
 	var err error
 
