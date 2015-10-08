@@ -32,6 +32,30 @@ func (c *Context) Scheme(ptrArgs interface{}) error {
 	return Scheme(c.Values, ptrArgs)
 }
 
+func (c *Context) SchemeParam(ptrArg interface{}, tag string) error {
+	return SchemeParam(c.Values, ptrArg, tag)
+}
+
+func (c *Context) SchemeInt(tag string) (v int, err error) {
+	err = c.SchemeParam(&v, tag)
+	return
+}
+
+func (c *Context) SchemeInt64(tag string) (v int64, err error) {
+	err = c.SchemeParam(&v, tag)
+	return
+}
+
+func (c *Context) SchemeString(tag string) (v string, err error) {
+	err = c.SchemeParam(&v, tag)
+	return
+}
+
+func (c *Context) SchemeBool(tag string) (v bool, err error) {
+	err = c.SchemeParam(&v, tag)
+	return
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 
 func newContext(w http.ResponseWriter, r *http.Request) (*Context, error) {
