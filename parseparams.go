@@ -57,6 +57,8 @@ func ParseParams(c *Context) error {
 			}
 
 			for k, raw := range jsonValues {
+				r.PostForm[k] = []string{string(raw)}
+
 				if len(raw) > 0 && (raw[0] != '"') {
 					c.Values[k] = string(raw) // not unpack json slice or object
 					continue
@@ -100,6 +102,7 @@ func ParseParams(c *Context) error {
 
 				if part.FileName == "" {
 					c.Values[part.FormName] = string(part.Data)
+					r.PostForm[part.FormName] = []string{string(part.Data)}
 				}
 
 				c.Multipart = append(c.Multipart, part)
@@ -120,8 +123,10 @@ func ParseParams(c *Context) error {
 					continue
 				} else if len(vs) == 1 {
 					c.Values[k] = vs[0]
+					r.PostForm[k] = vs
 				} else {
 					c.Values[k] = strings.Join(vs, ",")
+					r.PostForm[k] = vs
 				}
 			}
 			c.Values["_POST_"] = vals

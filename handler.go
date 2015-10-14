@@ -8,10 +8,6 @@ import (
 	"time"
 )
 
-type Logger interface {
-	OnLog(r *http.Request, start time.Time, used time.Duration, code int, result interface{})
-}
-
 type Handler interface{}
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -77,6 +77,8 @@ func NewWeb() *Web {
 
 	w.responser = new(DefaultResponser)
 
+	w.logger = NewStdLogger()
+
 	w.closed = false
 	return w
 }
