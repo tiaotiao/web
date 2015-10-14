@@ -30,6 +30,7 @@ func (l *StdLogger) OnLog(r *http.Request, start time.Time, used time.Duration, 
 		if post != "" {
 			post = " " + post
 		}
+		post = strings.Replace(post, "\n", " ", -1)
 	}
-	fmt.Printf("[%s] %3d - %4s %s%s - %dns %v\n", start.Format("0102 15:04:05"), code, r.Method, r.RequestURI, post, used, result)
+	fmt.Printf("[%s] %3d - %4s %s%s - %dns %v\n", start.Format("01/02 15:04:05"), code, r.Method, r.RequestURI, post, used, result)
 }
