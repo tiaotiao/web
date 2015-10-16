@@ -1,4 +1,4 @@
-web
+web [![GoDoc](https://godoc.org/github.com/gocraft/web?status.png)](https://godoc.org/github.com/tiaotiao/web)
 =======================
 tiaotiao/web is a web server framework of golang.
 
