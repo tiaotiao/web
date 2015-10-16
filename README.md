@@ -10,11 +10,11 @@ Install:
 	# go get github.com/tiaotiao/web
   
 A simple HelloWorld example:
-```
+```go
 package main
 
 import (
-	github.com/tiaotiao/web
+	"github.com/tiaotiao/web"
 )
 
 func Hello(c *web.Context) interface{} {
